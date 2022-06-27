@@ -21,6 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttPingSender
 import org.eclipse.paho.client.mqttv3.internal.ClientComms
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
+import java.lang.Exception
 
 /**
  * Default ping sender implementation on Android. It is based on AlarmManager.
@@ -83,9 +84,15 @@ internal class AlarmPingSender(val service: MqttService) : MqttPingSender {
             // In SDK 23 and above, dosing will prevent setExact, setExactAndAllowWhileIdle will force
             // the device to run this task whilst dosing.
             Timber.d("Alarm schedule using setExactAndAllowWhileIdle, next: $delayInMilliseconds")
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextAlarmInMilliseconds, pendingIntent)
-        } else
+            try {
+                alarmManager.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextAlarmInMilliseconds, pendingIntent)
+            } catch (e: Exception) {
+
+            }
+
+        } else {
             Timber.d("Alarm schedule using setExact, delay: $delayInMilliseconds")
+        }
         alarmManager.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, nextAlarmInMilliseconds, pendingIntent)
     }
 
